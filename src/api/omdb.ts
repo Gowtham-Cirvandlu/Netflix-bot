@@ -1,15 +1,16 @@
 import type { Movie, MovieSearchResponse, OMDBMovieResponse } from '@/types/movie';
 
-const OMDB_BASE_URL = 'http://www.omdbapi.com/';
+const OMDB_BASE_URL = 'https://www.omdbapi.com/';
 const API_KEY = '73643836';
 
 const getApiKey = (): string => {
-  // First try environment variable
   const envKey = import.meta.env.VITE_OMDB_API_KEY;
   if (envKey && envKey !== 'your_omdb_api_key_here') {
     return envKey;
   }
-  // Fall back to hardcoded key
+  if (!API_KEY) {
+    console.error('OMDB API key is not set. Set VITE_OMDB_API_KEY in your .env file.');
+  }
   return API_KEY;
 };
 
@@ -25,6 +26,10 @@ export const getMovieById = async (imdbId: string): Promise<Movie | null> => {
     url.searchParams.append('i', imdbId);
     url.searchParams.append('plot', 'full');
 
+    if (import.meta.env.DEV) {
+      console.log('[OMDB] getMovieById:', imdbId);
+    }
+
     const response = await fetch(url.toString());
     
     if (!response.ok) {
@@ -34,12 +39,13 @@ export const getMovieById = async (imdbId: string): Promise<Movie | null> => {
     const data: OMDBMovieResponse = await response.json();
     
     if (data.Response === 'False' || !data.imdbID) {
+      console.error('[OMDB] Movie not found:', imdbId, data.Error);
       return null;
     }
     
     return mapOMDBToMovie(data);
   } catch (error) {
-    console.error('Error fetching movie by ID:', error);
+    console.error('[OMDB] Error fetching movie by ID:', imdbId, error);
     return null;
   }
 };
@@ -51,6 +57,10 @@ export const getMovieByTitle = async (title: string): Promise<Movie | null> => {
     url.searchParams.append('t', title);
     url.searchParams.append('plot', 'full');
 
+    if (import.meta.env.DEV) {
+      console.log('[OMDB] getMovieByTitle:', title);
+    }
+
     const response = await fetch(url.toString());
     
     if (!response.ok) {
@@ -60,12 +70,13 @@ export const getMovieByTitle = async (title: string): Promise<Movie | null> => {
     const data: OMDBMovieResponse = await response.json();
     
     if (data.Response === 'False' || !data.imdbID) {
+      console.error('[OMDB] Movie not found by title:', title, data.Error);
       return null;
     }
     
     return mapOMDBToMovie(data);
   } catch (error) {
-    console.error('Error fetching movie by title:', error);
+    console.error('[OMDB] Error fetching movie by title:', title, error);
     return null;
   }
 };
@@ -78,6 +89,10 @@ export const searchMovies = async (query: string, page: number = 1): Promise<Mov
     url.searchParams.append('page', String(page));
     url.searchParams.append('type', 'movie');
 
+    if (import.meta.env.DEV) {
+      console.log('[OMDB] searchMovies:', query, 'page:', page);
+    }
+
     const response = await fetch(url.toString());
     
     if (!response.ok) {
@@ -87,6 +102,7 @@ export const searchMovies = async (query: string, page: number = 1): Promise<Mov
     const data = await response.json();
     
     if (data.Response === 'False') {
+      console.error('[OMDB] Search returned no results:', query, data.Error);
       return {
         Search: [],
         totalResults: 0,
@@ -100,7 +116,7 @@ export const searchMovies = async (query: string, page: number = 1): Promise<Mov
       Response: data.Response,
     };
   } catch (error) {
-    console.error('Error searching movies:', error);
+    console.error('[OMDB] Error searching movies:', query, error);
     return {
       Search: [],
       totalResults: 0,
