@@ -1,12 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
-import { 
-  getTrendingMovies, 
-  getPopularMovies, 
-  getTopRatedMovies, 
-  getUpcomingMovies, 
-  getNowPlayingMovies 
+import {
+  getTrendingMovies,
+  getPopularMovies,
+  getTopRatedMovies,
+  getUpcomingMovies,
+  getNowPlayingMovies
 } from '@/api/tmdb';
-import type { Movie } from '@/types/movie';
 
 export const useTrendingMovies = (page: number = 1) => {
   return useQuery({

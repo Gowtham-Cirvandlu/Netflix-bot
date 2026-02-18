@@ -19,8 +19,8 @@ const buttonVariants = cva(
           "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
-        netflix: "bg-netflix-red text-white hover:bg-netflix-red-dark shadow",
-        netflixSecondary: "bg-netflix-gray text-white hover:bg-netflix-gray-dark",
+        netflix: "bg-netflix-red text-white hover:bg-[#B81D24] shadow",
+        netflixSecondary: "bg-gray-800 text-white hover:bg-gray-700",
       },
       size: {
         default: "h-9 px-4 py-2",
@@ -56,4 +56,5 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 )
 Button.displayName = "Button"
 
+/* eslint-disable react-refresh/only-export-components */
 export { Button, buttonVariants }

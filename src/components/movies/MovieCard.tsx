@@ -1,16 +1,18 @@
-import { useState } from 'react'
-import { Play, Plus, Check, Info, Star } from 'lucide-react'
+import React, { useState } from 'react'
+import { Play, Plus, Check, Info } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { getPosterUrl } from '@/api/tmdb'
 import { cn, getYearFromDate } from '@/lib/utils'
 import type { Movie } from '@/types/movie'
 import { useMyList } from '@/hooks/useMyList'
 
+/* eslint-disable no-unused-vars */
 interface MovieCardProps {
   movie: Movie
   onShowDetails?: (movie: Movie) => void
   size?: 'small' | 'medium' | 'large'
 }
+/* eslint-enable no-unused-vars */
 
 export default function MovieCard({ movie, onShowDetails, size = 'medium' }: MovieCardProps) {
   const [isHovered, setIsHovered] = useState(false)

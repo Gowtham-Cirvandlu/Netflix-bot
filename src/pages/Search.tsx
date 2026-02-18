@@ -5,7 +5,6 @@ import Footer from '@/components/layout/Footer'
 import MovieCard from '@/components/movies/MovieCard'
 import MovieDetailModal from '@/components/movies/MovieDetailModal'
 import { useMovieSearch } from '@/hooks/useMovieSearch'
-import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import type { Movie } from '@/types/movie'
 
