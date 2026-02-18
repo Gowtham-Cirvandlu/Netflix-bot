@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Home, Search, Film } from 'lucide-react'
+import { Home, Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import NetflixNavbar from '@/components/layout/NetflixNavbar'
 import Footer from '@/components/layout/Footer'
@@ -29,10 +29,10 @@ export default function NotFound() {
           {/* Actions */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link to="/browse">
-              <Button className="bg-netflix-red hover:bg-netflix-red-dark text-white">
-                <Home className="h-5 w-5 mr-2" />
-                Go Home
-              </Button>
+            <Button className="bg-netflix-red hover:bg-[#B81D24] text-white">
+              <Home className="h-5 w-5 mr-2" />
+              Go Home
+            </Button>
             </Link>
             <Link to="/search">
               <Button variant="outline" className="border-gray-600 text-white hover:bg-gray-800">

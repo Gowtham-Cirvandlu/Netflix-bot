@@ -3,14 +3,15 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import MovieCard from './MovieCard'
 import type { Movie } from '@/types/movie'
-import { cn } from '@/lib/utils'
 
+/* eslint-disable no-unused-vars */
 interface MovieRowProps {
   title: string
   movies: Movie[]
   isLoading?: boolean
   onShowDetails?: (movie: Movie) => void
 }
+/* eslint-enable no-unused-vars */
 
 export default function MovieRow({ title, movies, isLoading, onShowDetails }: MovieRowProps) {
   const [showLeftArrow, setShowLeftArrow] = useState(false)

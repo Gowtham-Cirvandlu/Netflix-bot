@@ -1,16 +1,18 @@
-import { Play, Info, Plus, Check, Star } from 'lucide-react'
+import React, { useState } from 'react'
+import { Play, Info, Plus, Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { getBackdropUrl, getPosterUrl } from '@/api/tmdb'
-import { cn, formatDate, getYearFromDate } from '@/lib/utils'
+import { getBackdropUrl } from '@/api/tmdb'
+import { cn, getYearFromDate } from '@/lib/utils'
 import type { Movie } from '@/types/movie'
 import { useMyList } from '@/hooks/useMyList'
-import { useState } from 'react'
 
+/* eslint-disable no-unused-vars */
 interface HeroSectionProps {
   movie: Movie | null
   isLoading?: boolean
   onShowDetails?: (movie: Movie) => void
 }
+/* eslint-enable no-unused-vars */
 
 export default function HeroSection({ movie, isLoading, onShowDetails }: HeroSectionProps) {
   const { isInMyList, addToMyList, removeFromMyList } = useMyList()
@@ -29,7 +31,6 @@ export default function HeroSection({ movie, isLoading, onShowDetails }: HeroSec
   }
 
   const backdropUrl = getBackdropUrl(movie.backdrop_path, 'original')
-  const posterUrl = getPosterUrl(movie.poster_path, 'w500')
   const isInList = isInMyList(movie.id)
 
   const handleMyListToggle = (e: React.MouseEvent) => {

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { Play, Plus, Check, Star, Clock, Calendar, Users, Globe, X } from 'lucide-react'
+import { Play, Plus, Check, Clock, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { getMovieDetails, getBackdropUrl, getPosterUrl } from '@/api/tmdb'
@@ -14,22 +14,22 @@ interface MovieDetailModalProps {
   onOpenChange: (open: boolean) => void
 }
 
-export default function MovieDetailModal({ movie, open, onOpenChange }: MovieDetailModalProps) {
+export default function MovieDetailModal({ movie, open: _open, onOpenChange }: MovieDetailModalProps) {
   const { isInMyList, addToMyList, removeFromMyList } = useMyList()
   const [imageLoaded, setImageLoaded] = useState(false)
 
-  const { data: movieDetails, isLoading } = useQuery<MovieDetails>({
+  const { data: movieDetails } = useQuery<MovieDetails>({
     queryKey: ['movie', 'details', movie?.id],
     queryFn: () => getMovieDetails(movie!.id),
-    enabled: !!movie && open,
+    enabled: !!movie && _open,
     staleTime: 1000 * 60 * 30,
   })
 
   useEffect(() => {
-    if (!open) {
+    if (!_open) {
       setImageLoaded(false)
     }
-  }, [open])
+  }, [_open])
 
   if (!movie) return null
 
@@ -136,7 +136,7 @@ export default function MovieDetailModal({ movie, open, onOpenChange }: MovieDet
                 <Button
                   variant={isInList ? "default" : "outline"}
                   className={cn(
-                    isInList ? "bg-netflix-red hover:bg-netflix-red-dark" : "border-gray-600 text-white hover:bg-gray-800"
+                    isInList ? "bg-netflix-red hover:bg-[#B81D24]" : "border-gray-600 text-white hover:bg-gray-800"
                   )}
                   onClick={handleMyListToggle}
                 >
