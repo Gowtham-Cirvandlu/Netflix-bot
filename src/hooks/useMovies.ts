@@ -6,7 +6,13 @@ import type { MovieCategory } from '@/types/movie';
 export const useMoviesByIds = (imdbIds: string[]) => {
   return useQuery({
     queryKey: ['movies', 'byIds', imdbIds],
-    queryFn: () => getMoviesByIds(imdbIds),
+    queryFn: async () => {
+      const result = await getMoviesByIds(imdbIds);
+      if (result.length === 0) {
+        console.error('[useMoviesByIds] No movies returned for IDs:', imdbIds);
+      }
+      return result;
+    },
     enabled: imdbIds.length > 0,
     staleTime: 1000 * 60 * 30,
   });
@@ -48,7 +54,13 @@ export const useScifiMovies = () => {
 export const useFeaturedMovie = () => {
   return useQuery({
     queryKey: ['movie', 'featured'],
-    queryFn: getRandomFeaturedMovie,
+    queryFn: async () => {
+      const result = await getRandomFeaturedMovie();
+      if (!result) {
+        console.error('[useFeaturedMovie] Failed to load featured movie');
+      }
+      return result;
+    },
     staleTime: 1000 * 60 * 30,
   });
 };

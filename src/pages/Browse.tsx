@@ -1,10 +1,12 @@
 import { useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
+import { useQueryClient } from '@tanstack/react-query'
 import NetflixNavbar from '@/components/layout/NetflixNavbar'
 import Footer from '@/components/layout/Footer'
 import HeroSection from '@/components/movies/HeroSection'
 import MovieRow from '@/components/movies/MovieRow'
 import MovieDetailModal from '@/components/movies/MovieDetailModal'
+import ErrorDisplay from '@/components/ErrorDisplay'
 import { 
   usePopularMovies, 
   useTrendingMovies, 
@@ -17,17 +19,16 @@ import type { Movie } from '@/types/movie'
 export default function Browse() {
   const [searchParams] = useSearchParams()
   const listType = searchParams.get('list')
+  const queryClient = useQueryClient()
   
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null)
   const [modalOpen, setModalOpen] = useState(false)
 
-  // Fetch movie data
-  const { data: featuredData, isLoading: featuredLoading } = useFeaturedMovie()
-  const { data: popularData, isLoading: popularLoading } = usePopularMovies()
-  const { data: trendingData, isLoading: trendingLoading } = useTrendingMovies()
-  const { data: topRatedData, isLoading: topRatedLoading } = useTopRatedMovies()
+  const { data: featuredData, isLoading: featuredLoading, error: featuredError } = useFeaturedMovie()
+  const { data: popularData, isLoading: popularLoading, error: popularError } = usePopularMovies()
+  const { data: trendingData, isLoading: trendingLoading, error: trendingError } = useTrendingMovies()
+  const { data: topRatedData, isLoading: topRatedLoading, error: topRatedError } = useTopRatedMovies()
   
-  // My List
   const { myList } = useMyList()
 
   const handleShowDetails = (movie: Movie) => {
@@ -35,16 +36,24 @@ export default function Browse() {
     setModalOpen(true)
   }
 
-  // Check if showing My List only
+  const handleRetry = () => {
+    queryClient.invalidateQueries()
+  }
+
   const showMyListOnly = listType === 'mine'
+
+  const hasError = !!(featuredError || popularError || trendingError || topRatedError)
+  const isLoading = featuredLoading || popularLoading || trendingLoading || topRatedLoading
+  const hasMovies =
+    (popularData && popularData.length > 0) ||
+    (trendingData && trendingData.length > 0) ||
+    (topRatedData && topRatedData.length > 0)
 
   return (
     <div className="min-h-screen bg-netflix-black">
       <NetflixNavbar />
       
-      {/* Main Content */}
       <main className="pt-16">
-        {/* Hero Section - Only show on main browse (not My List) */}
         {!showMyListOnly && (
           <HeroSection 
             movie={featuredData || null}
@@ -53,10 +62,8 @@ export default function Browse() {
           />
         )}
 
-        {/* Movie Rows */}
         <div className={showMyListOnly ? 'pt-8' : 'pb-12'}>
           {showMyListOnly ? (
-            // My List View
             <div>
               <h2 className="text-2xl md:text-3xl font-semibold text-white mb-6 px-4 md:px-8">
                 My List
@@ -79,34 +86,42 @@ export default function Browse() {
               )}
             </div>
           ) : (
-            // All Categories
             <>
-              <MovieRow
-                title="Popular Movies"
-                movies={popularData || []}
-                isLoading={popularLoading}
-                onShowDetails={handleShowDetails}
-              />
-              <MovieRow
-                title="Trending Now"
-                movies={trendingData || []}
-                isLoading={trendingLoading}
-                onShowDetails={handleShowDetails}
-              />
-              <MovieRow
-                title="Top Rated"
-                movies={topRatedData || []}
-                isLoading={topRatedLoading}
-                onShowDetails={handleShowDetails}
-              />
-              
-              {/* My List Section (if not empty) */}
-              {myList.length > 0 && (
-                <MovieRow
-                  title="My List"
-                  movies={myList}
-                  onShowDetails={handleShowDetails}
+              {!isLoading && hasError && !hasMovies ? (
+                <ErrorDisplay
+                  title="Couldn't load movies"
+                  message="We had trouble connecting to the movie database. Please check your connection and try again."
+                  onRetry={handleRetry}
                 />
+              ) : (
+                <>
+                  <MovieRow
+                    title="Popular Movies"
+                    movies={popularData || []}
+                    isLoading={popularLoading}
+                    onShowDetails={handleShowDetails}
+                  />
+                  <MovieRow
+                    title="Trending Now"
+                    movies={trendingData || []}
+                    isLoading={trendingLoading}
+                    onShowDetails={handleShowDetails}
+                  />
+                  <MovieRow
+                    title="Top Rated"
+                    movies={topRatedData || []}
+                    isLoading={topRatedLoading}
+                    onShowDetails={handleShowDetails}
+                  />
+
+                  {myList.length > 0 && (
+                    <MovieRow
+                      title="My List"
+                      movies={myList}
+                      onShowDetails={handleShowDetails}
+                    />
+                  )}
+                </>
               )}
             </>
           )}
@@ -115,7 +130,6 @@ export default function Browse() {
 
       <Footer />
 
-      {/* Movie Detail Modal */}
       <MovieDetailModal
         movie={selectedMovie}
         open={modalOpen}
