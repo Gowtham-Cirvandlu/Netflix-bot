@@ -4,14 +4,16 @@ import { Button } from '@/components/ui/button'
 import MovieCard from './MovieCard'
 import type { Movie } from '@/types/movie'
 
-/* eslint-disable no-unused-vars */
 interface MovieRowProps {
+   
   title: string
+   
   movies: Movie[]
+   
   isLoading?: boolean
+   
   onShowDetails?: (movie: Movie) => void
 }
-/* eslint-enable no-unused-vars */
 
 export default function MovieRow({ title, movies, isLoading, onShowDetails }: MovieRowProps) {
   const [showLeftArrow, setShowLeftArrow] = useState(false)
@@ -92,7 +94,7 @@ export default function MovieRow({ title, movies, isLoading, onShowDetails }: Mo
         >
           {movies.map((movie) => (
             <div 
-              key={movie.id} 
+              key={movie.imdbID} 
               className="flex-shrink-0"
               style={{ scrollSnapAlign: 'start' }}
             >

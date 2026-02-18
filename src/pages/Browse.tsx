@@ -5,7 +5,12 @@ import Footer from '@/components/layout/Footer'
 import HeroSection from '@/components/movies/HeroSection'
 import MovieRow from '@/components/movies/MovieRow'
 import MovieDetailModal from '@/components/movies/MovieDetailModal'
-import { usePopularMovies, useTrendingMovies, useTopRatedMovies, useUpcomingMovies, useFeaturedMovie } from '@/hooks/useMovies'
+import { 
+  usePopularMovies, 
+  useTrendingMovies, 
+  useTopRatedMovies,
+  useFeaturedMovie 
+} from '@/hooks/useMovies'
 import { useMyList } from '@/hooks/useMyList'
 import type { Movie } from '@/types/movie'
 
@@ -18,10 +23,9 @@ export default function Browse() {
 
   // Fetch movie data
   const { data: featuredData, isLoading: featuredLoading } = useFeaturedMovie()
-  const { data: trendingData, isLoading: trendingLoading } = useTrendingMovies()
   const { data: popularData, isLoading: popularLoading } = usePopularMovies()
+  const { data: trendingData, isLoading: trendingLoading } = useTrendingMovies()
   const { data: topRatedData, isLoading: topRatedLoading } = useTopRatedMovies()
-  const { data: upcomingData, isLoading: upcomingLoading } = useUpcomingMovies()
   
   // My List
   const { myList } = useMyList()
@@ -78,27 +82,21 @@ export default function Browse() {
             // All Categories
             <>
               <MovieRow
-                title="Trending Now"
-                movies={trendingData?.results || []}
-                isLoading={trendingLoading}
-                onShowDetails={handleShowDetails}
-              />
-              <MovieRow
                 title="Popular Movies"
-                movies={popularData?.results || []}
+                movies={popularData || []}
                 isLoading={popularLoading}
                 onShowDetails={handleShowDetails}
               />
               <MovieRow
-                title="Top Rated"
-                movies={topRatedData?.results || []}
-                isLoading={topRatedLoading}
+                title="Trending Now"
+                movies={trendingData || []}
+                isLoading={trendingLoading}
                 onShowDetails={handleShowDetails}
               />
               <MovieRow
-                title="Upcoming"
-                movies={upcomingData?.results || []}
-                isLoading={upcomingLoading}
+                title="Top Rated"
+                movies={topRatedData || []}
+                isLoading={topRatedLoading}
                 onShowDetails={handleShowDetails}
               />
               

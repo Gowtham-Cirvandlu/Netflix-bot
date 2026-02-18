@@ -1,94 +1,82 @@
 export interface Movie {
-  id: number;
-  title: string;
-  overview: string;
-  poster_path: string | null;
-  backdrop_path: string | null;
-  release_date: string;
-  vote_average: number;
-  vote_count: number;
-  genre_ids: number[];
-  adult: boolean;
-  original_language: string;
-  original_title: string;
-  popularity: number;
-  video: boolean;
+  imdbID: string;
+  Title: string;
+  Year: string;
+  Rated: string;
+  Released: string;
+  Runtime: string;
+  Genre: string;
+  Director: string;
+  Writer: string;
+  Actors: string;
+  Plot: string;
+  Poster: string;
+  Ratings: Rating[];
+  imdbRating: string;
+  imdbVotes: string;
+  Type: string;
+  totalSeasons?: string;
 }
 
-export interface MovieDetails extends Movie {
-  runtime: number;
-  genres: Genre[];
-  budget: number;
-  revenue: number;
-  tagline: string;
-  status: string;
-  homepage: string;
-  imdb_id: string;
-  production_companies: ProductionCompany[];
-  production_countries: ProductionCountry[];
-  spoken_languages: SpokenLanguage[];
+export interface Rating {
+  Source: string;
+  Value: string;
 }
 
-export interface Genre {
-  id: number;
-  name: string;
+export interface OMDBMovieResponse {
+  Title: string;
+  Year: string;
+  Rated: string;
+  Released: string;
+  Runtime: string;
+  Genre: string;
+  Director: string;
+  Writer: string;
+  Actors: string;
+  Plot: string;
+  Poster: string;
+  Ratings: Rating[];
+  Metascore: string;
+  imdbRating: string;
+  imdbVotes: string;
+  imdbID: string;
+  Type: string;
+  totalSeasons?: string;
+  Response: string;
 }
 
-export interface ProductionCompany {
-  id: number;
-  name: string;
-  logo_path: string | null;
-  origin_country: string;
+export interface MovieSearchResponse {
+  Search: Movie[];
+  totalResults: number;
+  Response: string;
 }
 
-export interface ProductionCountry {
-  iso_3166_1: string;
-  name: string;
-}
-
-export interface SpokenLanguage {
-  english_name: string;
-  iso_639_1: string;
-  name: string;
-}
-
-export interface MovieSearchResult {
-  page: number;
-  results: Movie[];
-  total_pages: number;
-  total_results: number;
-}
-
-export interface MovieListResponse {
-  page: number;
-  results: Movie[];
-  total_pages: number;
-  total_results: number;
+export interface MyListItem {
+  imdbID: string;
+  movie: Movie;
+  addedAt: string;
 }
 
 export type MovieCategory = 
   | 'popular'
-  | 'top_rated' 
-  | 'upcoming'
-  | 'now_playing'
-  | 'trending';
+  | 'trending' 
+  | 'top_rated'
+  | 'action'
+  | 'comedy'
+  | 'horror'
+  | 'scifi';
 
 export interface CategoryConfig {
   key: MovieCategory;
   title: string;
-  endpoint: string;
 }
 
 export const CATEGORIES: CategoryConfig[] = [
-  { key: 'popular', title: 'Popular Movies', endpoint: 'popular' },
-  { key: 'top_rated', title: 'Top Rated', endpoint: 'top_rated' },
-  { key: 'upcoming', title: 'Upcoming', endpoint: 'upcoming' },
-  { key: 'now_playing', title: 'Now Playing', endpoint: 'now_playing' },
-  { key: 'trending', title: 'Trending', endpoint: 'trending/all/week' },
+  { key: 'popular', title: 'Popular Movies' },
+  { key: 'trending', title: 'Trending Now' },
+  { key: 'top_rated', title: 'Top Rated' },
+  { key: 'action', title: 'Action Movies' },
+  { key: 'comedy', title: 'Comedy Movies' },
+  { key: 'horror', title: 'Horror & Thriller' },
+  { key: 'scifi', title: 'Sci-Fi & Fantasy' },
 ];
-
-export interface MyListItem {
-  id: number;
-  movie: Movie;
-  addedAt: string;
-}
