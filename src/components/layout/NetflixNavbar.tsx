@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { Search, Bell, User, List, ChevronDown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -15,36 +15,57 @@ const navItems = [
 
 export default function NetflixNavbar() {
   const [isProfileOpen, setIsProfileOpen] = useState(false)
+  const [isScrolled, setIsScrolled] = useState(false)
   const location = useLocation()
   const { count } = useMyList()
 
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50)
+    }
+
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-b from-black/80 via-black/40 to-transparent">
-      <div className="container mx-auto px-4 py-4">
+    <nav className={cn(
+      "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
+      isScrolled ? "bg-black/90 backdrop-blur-md shadow-lg" : "bg-gradient-to-b from-black/80 via-black/40 to-transparent"
+    )}>
+      <div className="container mx-auto px-4 md:px-8 py-4">
         <div className="flex items-center justify-between">
           {/* Left side - Logo and Navigation */}
-          <div className="flex items-center space-x-8">
-            {/* Netflix Logo */}
-            <Link to="/" className="text-netflix-red font-bold text-2xl tracking-tight">
+          <div className="flex items-center space-x-8 md:space-x-10">
+            {/* Netflix Logo - Larger */}
+            <Link to="/" className="text-netflix-red font-bold text-3xl md:text-4xl tracking-tight hover:opacity-80 transition-opacity">
               NETFLIX
             </Link>
 
             {/* Navigation Items - Hidden on mobile */}
-            <div className="hidden md:flex items-center space-x-6">
+            <div className="hidden md:flex items-center space-x-6 md:space-x-8">
               {navItems.map((item) => {
-                const isActive = location.pathname === item.path || 
+                const isActive = location.pathname === item.path ||
                   (item.path.includes('?') && location.pathname === '/browse' && location.search === item.path.split('?')[1])
-                
+
                 return (
                   <Link
                     key={item.path}
                     to={item.path}
                     className={cn(
-                      "text-sm font-medium transition-colors hover:text-gray-300",
-                      isActive ? "text-white" : "text-gray-400"
+                      "text-sm md:text-base font-medium transition-colors hover:text-gray-300 relative group",
+                      isActive ? "text-white" : "text-gray-300"
                     )}
                   >
                     {item.name}
+                    {/* Netflix-style red underline for active tab */}
+                    {isActive && (
+                      <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-netflix-red" />
+                    )}
+                    {/* Hover underline */}
+                    {!isActive && (
+                      <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-netflix-red transform scale-x-0 group-hover:scale-x-100 transition-transform" />
+                    )}
                     {item.name === 'My List' && count > 0 && (
                       <span className="ml-1 bg-netflix-red text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                         {count}
@@ -60,8 +81,8 @@ export default function NetflixNavbar() {
           <div className="flex items-center space-x-4">
             {/* Search Button */}
             <Link to="/search">
-              <Button 
-                variant="ghost" 
+              <Button
+                variant="ghost"
                 size="icon"
                 className="text-white hover:text-gray-300 hover:bg-white/10"
               >
@@ -70,8 +91,8 @@ export default function NetflixNavbar() {
             </Link>
 
             {/* Notifications */}
-            <Button 
-              variant="ghost" 
+            <Button
+              variant="ghost"
               size="icon"
               className="text-white hover:text-gray-300 hover:bg-white/10 hidden md:flex"
             >
@@ -79,7 +100,7 @@ export default function NetflixNavbar() {
             </Button>
 
             {/* My List Indicator */}
-            <div className="hidden md:flex items-center text-sm text-gray-400">
+            <div className="hidden md:flex items-center text-sm text-gray-300">
               <List className="h-4 w-4 mr-1" />
               <span>{count}</span>
             </div>
@@ -88,21 +109,21 @@ export default function NetflixNavbar() {
             <div className="relative">
               <button
                 onClick={() => setIsProfileOpen(!isProfileOpen)}
-                className="flex items-center space-x-1 text-white hover:text-gray-300 transition-colors"
+                className="flex items-center space-x-2 text-white hover:text-gray-300 transition-colors"
               >
-                <div className="w-8 h-8 bg-netflix-red rounded flex items-center justify-center">
-                  <User className="h-4 w-4" />
+                <div className="w-9 h-9 bg-netflix-red rounded flex items-center justify-center">
+                  <User className="h-5 w-5" />
                 </div>
                 <ChevronDown className={cn("h-4 w-4 transition-transform", isProfileOpen && "rotate-180")} />
               </button>
 
               {/* Profile Dropdown Menu */}
               {isProfileOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-black/90 border border-gray-800 rounded-md shadow-lg">
+                <div className="absolute right-0 mt-2 w-48 bg-black/95 border border-gray-800 rounded-md shadow-xl backdrop-blur-sm">
                   <div className="py-1">
-                    <div className="px-4 py-2 text-sm text-gray-300 border-b border-gray-800">
-                      <div className="font-medium">Netflix Bot</div>
-                      <div className="text-gray-400">Movie Discovery</div>
+                    <div className="px-4 py-3 text-sm text-gray-300 border-b border-gray-800">
+                      <div className="font-medium text-white">Netflix Bot</div>
+                      <div className="text-gray-400 text-xs">Movie Discovery</div>
                     </div>
                     <Link
                       to="/browse"

@@ -86,20 +86,20 @@ export default function MovieRow({ title, movies, isLoading, onShowDetails }: Mo
         )}
 
         {/* Movies Container */}
-        <div 
+        <div
           ref={scrollRef}
-          className="flex gap-4 px-4 md:px-8 overflow-x-auto scrollbar-hide pb-4"
+          className="flex gap-4 px-4 md:px-8 overflow-x-auto scrollbar-hide movie-row pb-4"
           onScroll={handleScroll}
           style={{ scrollSnapType: 'x mandatory' }}
         >
           {movies.map((movie) => (
-            <div 
-              key={movie.imdbID} 
+            <div
+              key={movie.imdbID}
               className="flex-shrink-0"
               style={{ scrollSnapAlign: 'start' }}
             >
-              <MovieCard 
-                movie={movie} 
+              <MovieCard
+                movie={movie}
                 onShowDetails={onShowDetails}
               />
             </div>

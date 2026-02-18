@@ -8,11 +8,11 @@ import type { Movie } from '@/types/movie'
 import { useMyList } from '@/hooks/useMyList'
 
 interface MovieDetailModalProps {
-   
+
   movie: Movie | null
-   
+
   open: boolean
-   
+
   onOpenChange: (open: boolean) => void
 }
 
@@ -23,6 +23,29 @@ export default function MovieDetailModal({ movie, open: _open, onOpenChange }: M
   useEffect(() => {
     if (!_open) {
       setImageLoaded(false)
+    }
+  }, [_open])
+
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && _open) {
+        onOpenChange(false)
+      }
+    }
+
+    document.addEventListener('keydown', handleEscape)
+    return () => document.removeEventListener('keydown', handleEscape)
+  }, [_open, onOpenChange])
+
+  // Lock body scroll when modal is open
+  useEffect(() => {
+    if (_open) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = 'unset'
+    }
+    return () => {
+      document.body.style.overflow = 'unset'
     }
   }, [_open])
 
@@ -50,17 +73,17 @@ export default function MovieDetailModal({ movie, open: _open, onOpenChange }: M
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl w-full bg-gray-900 border-gray-800 p-0 overflow-hidden text-white max-h-[90vh] overflow-y-auto">
+    <Dialog open={_open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-4xl w-full bg-gray-900 border-gray-800 p-0 overflow-hidden text-white max-h-[90vh] overflow-y-auto animate-scale-in">
         {/* Backdrop / Poster */}
-        <div className="relative h-[200px] md:h-[300px] overflow-hidden">
+        <div className="relative h-[200px] md:h-[300px] overflow-hidden backdrop-blur-sm">
           {posterUrl ? (
             <>
               <img
                 src={posterUrl}
                 alt={movie.Title}
                 className={cn(
-                  "w-full h-full object-cover transition-opacity duration-500 opacity-30 blur-30 scale-110",
+                  "w-full h-full object-cover transition-opacity duration-500 opacity-30 blur-[30px] scale-110",
                   imageLoaded ? "opacity-30" : "opacity-0"
                 )}
                 onLoad={() => setImageLoaded(true)}
@@ -70,19 +93,18 @@ export default function MovieDetailModal({ movie, open: _open, onOpenChange }: M
           ) : (
             <div className="absolute inset-0 bg-gray-800" />
           )}
-          
+
           {/* Gradient Overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/50 to-transparent" />
-          
-          {/* Close Button */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="absolute top-4 right-4 rounded-full bg-black/50 hover:bg-black/80 text-white z-10"
+
+          {/* Close Button - Fixed with proper z-index */}
+          <button
             onClick={() => onOpenChange(false)}
+            className="absolute top-4 right-4 z-50 bg-black/50 rounded-full p-2 hover:bg-black/70 transition-all duration-200 flex items-center justify-center"
+            aria-label="Close modal"
           >
-            <X className="h-5 w-5" />
-          </Button>
+            <X className="w-6 h-6 text-white" />
+          </button>
         </div>
 
         {/* Content */}
