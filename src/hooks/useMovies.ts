@@ -1,62 +1,63 @@
 import { useQuery } from '@tanstack/react-query';
-import {
-  getTrendingMovies,
-  getPopularMovies,
-  getTopRatedMovies,
-  getUpcomingMovies,
-  getNowPlayingMovies
-} from '@/api/tmdb';
+import { getMoviesByIds, getRandomFeaturedMovie, getMovieById } from '@/api/omdb';
+import { CATEGORY_MOVIES, POPULAR_MOVIES } from '@/data/movieIds';
+import type { MovieCategory } from '@/types/movie';
 
-export const useTrendingMovies = (page: number = 1) => {
+export const useMoviesByIds = (imdbIds: string[]) => {
   return useQuery({
-    queryKey: ['movies', 'trending', page],
-    queryFn: () => getTrendingMovies(page),
-    staleTime: 1000 * 60 * 5,
+    queryKey: ['movies', 'byIds', imdbIds],
+    queryFn: () => getMoviesByIds(imdbIds),
+    enabled: imdbIds.length > 0,
+    staleTime: 1000 * 60 * 30,
   });
 };
 
-export const usePopularMovies = (page: number = 1) => {
-  return useQuery({
-    queryKey: ['movies', 'popular', page],
-    queryFn: () => getPopularMovies(page),
-    staleTime: 1000 * 60 * 5,
-  });
+export const useCategoryMovies = (category: MovieCategory) => {
+  const movieIds = CATEGORY_MOVIES[category] || POPULAR_MOVIES;
+  return useMoviesByIds(movieIds);
 };
 
-export const useTopRatedMovies = (page: number = 1) => {
-  return useQuery({
-    queryKey: ['movies', 'top_rated', page],
-    queryFn: () => getTopRatedMovies(page),
-    staleTime: 1000 * 60 * 5,
-  });
+export const usePopularMovies = () => {
+  return useCategoryMovies('popular');
 };
 
-export const useUpcomingMovies = (page: number = 1) => {
-  return useQuery({
-    queryKey: ['movies', 'upcoming', page],
-    queryFn: () => getUpcomingMovies(page),
-    staleTime: 1000 * 60 * 5,
-  });
+export const useTrendingMovies = () => {
+  return useCategoryMovies('trending');
 };
 
-export const useNowPlayingMovies = (page: number = 1) => {
-  return useQuery({
-    queryKey: ['movies', 'now_playing', page],
-    queryFn: () => getNowPlayingMovies(page),
-    staleTime: 1000 * 60 * 5,
-  });
+export const useTopRatedMovies = () => {
+  return useCategoryMovies('top_rated');
+};
+
+export const useActionMovies = () => {
+  return useCategoryMovies('action');
+};
+
+export const useComedyMovies = () => {
+  return useCategoryMovies('comedy');
+};
+
+export const useHorrorMovies = () => {
+  return useCategoryMovies('horror');
+};
+
+export const useScifiMovies = () => {
+  return useCategoryMovies('scifi');
 };
 
 export const useFeaturedMovie = () => {
   return useQuery({
     queryKey: ['movie', 'featured'],
-    queryFn: async () => {
-      const { results } = await getPopularMovies(1);
-      const movies = results.filter(m => m.backdrop_path && m.overview);
-      if (movies.length === 0) return null;
-      const randomIndex = Math.floor(Math.random() * Math.min(10, movies.length));
-      return movies[randomIndex];
-    },
+    queryFn: getRandomFeaturedMovie,
+    staleTime: 1000 * 60 * 30,
+  });
+};
+
+export const useMovieById = (imdbId: string) => {
+  return useQuery({
+    queryKey: ['movie', 'byId', imdbId],
+    queryFn: () => getMovieById(imdbId),
+    enabled: !!imdbId,
     staleTime: 1000 * 60 * 30,
   });
 };

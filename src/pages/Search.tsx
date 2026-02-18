@@ -100,7 +100,7 @@ export default function Search() {
               </div>
             )}
 
-            {!searchLoading && query.length > 0 && searchResults?.results?.length === 0 && (
+            {!searchLoading && query.length > 0 && searchResults?.Search?.length === 0 && (
               <div className="text-center py-12">
                 <div className="text-gray-500 text-lg mb-4">
                   No results found for "{query}"
@@ -111,34 +111,27 @@ export default function Search() {
               </div>
             )}
 
-            {searchResults?.results && searchResults.results.length > 0 && (
+            {searchResults?.Search && searchResults.Search.length > 0 && (
               <div>
                 <div className="mb-6">
                   <h2 className="text-xl md:text-2xl font-semibold text-white">
                     Search Results for "{query}"
                   </h2>
                   <p className="text-gray-400 mt-1">
-                    {searchResults.total_results} movies found
+                    {searchResults.totalResults} movies found
                   </p>
                 </div>
                 
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-                  {searchResults.results.map((movie) => (
+                  {searchResults.Search.map((movie) => (
                     <MovieCard
-                      key={movie.id}
+                      key={movie.imdbID}
                       movie={movie}
                       onShowDetails={handleShowDetails}
                       size="medium"
                     />
                   ))}
                 </div>
-
-                {/* Pagination Info */}
-                {searchResults.total_pages > 1 && (
-                  <div className="text-center mt-8 text-gray-400">
-                    Page {searchResults.page} of {searchResults.total_pages}
-                  </div>
-                )}
               </div>
             )}
           </div>

@@ -1,31 +1,32 @@
 import React, { useState } from 'react'
 import { Play, Plus, Check, Info } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { getPosterUrl } from '@/api/tmdb'
-import { cn, getYearFromDate } from '@/lib/utils'
+import { getPosterUrl } from '@/api/omdb'
+import { cn } from '@/lib/utils'
 import type { Movie } from '@/types/movie'
 import { useMyList } from '@/hooks/useMyList'
 
-/* eslint-disable no-unused-vars */
 interface MovieCardProps {
+   
   movie: Movie
+   
   onShowDetails?: (movie: Movie) => void
+   
   size?: 'small' | 'medium' | 'large'
 }
-/* eslint-enable no-unused-vars */
 
 export default function MovieCard({ movie, onShowDetails, size = 'medium' }: MovieCardProps) {
   const [isHovered, setIsHovered] = useState(false)
   const [imageLoaded, setImageLoaded] = useState(false)
   const { isInMyList, addToMyList, removeFromMyList } = useMyList()
 
-  const posterUrl = getPosterUrl(movie.poster_path, size === 'small' ? 'w185' : size === 'large' ? 'w500' : 'w342')
-  const isInList = isInMyList(movie.id)
+  const posterUrl = getPosterUrl(movie.Poster)
+  const isInList = isInMyList(movie.imdbID)
 
   const handleMyListToggle = (e: React.MouseEvent) => {
     e.stopPropagation()
     if (isInList) {
-      removeFromMyList(movie.id)
+      removeFromMyList(movie.imdbID)
     } else {
       addToMyList(movie)
     }
@@ -57,11 +58,11 @@ export default function MovieCard({ movie, onShowDetails, size = 'medium' }: Mov
         "relative overflow-hidden rounded-md bg-gray-800 aspect-[2/3]",
         isHovered && "movie-card-hover"
       )}>
-        {posterUrl && (
+        {posterUrl ? (
           <>
             <img
               src={posterUrl}
-              alt={movie.title}
+              alt={movie.Title}
               className={cn(
                 "w-full h-full object-cover transition-opacity duration-300",
                 imageLoaded ? "opacity-100" : "opacity-0"
@@ -73,6 +74,10 @@ export default function MovieCard({ movie, onShowDetails, size = 'medium' }: Mov
               <div className="absolute inset-0 bg-gray-800 animate-pulse" />
             )}
           </>
+        ) : (
+          <div className="absolute inset-0 bg-gray-800 flex items-center justify-center">
+            <span className="text-gray-500 text-sm text-center p-2">No Poster</span>
+          </div>
         )}
 
         {/* Hover Overlay */}
@@ -97,22 +102,22 @@ export default function MovieCard({ movie, onShowDetails, size = 'medium' }: Mov
             {/* Info at Bottom */}
             <div className="absolute bottom-0 left-0 right-0 p-3">
               <h4 className="text-white text-sm font-medium truncate mb-1">
-                {movie.title}
+                {movie.Title}
               </h4>
               <div className="flex items-center gap-2 text-xs text-gray-400">
                 <span className="text-green-500 font-medium">
-                  {Math.round(movie.vote_average * 10)}%
+                  {movie.imdbRating !== 'N/A' ? movie.imdbRating : 'N/A'}
                 </span>
-                <span>{getYearFromDate(movie.release_date)}</span>
+                <span>{movie.Year}</span>
               </div>
             </div>
           </div>
         )}
 
         {/* Rating Badge (when not hovered) */}
-        {!isHovered && (
+        {!isHovered && movie.imdbRating !== 'N/A' && (
           <div className="absolute top-2 left-2 bg-black/70 px-1.5 py-0.5 rounded text-xs text-white font-medium">
-            {Math.round(movie.vote_average * 10)}%
+            {movie.imdbRating}
           </div>
         )}
       </div>
@@ -122,12 +127,16 @@ export default function MovieCard({ movie, onShowDetails, size = 'medium' }: Mov
         <div className="absolute top-0 left-0 right-0 bg-gray-900 rounded-md overflow-hidden shadow-2xl z-30">
           {/* Expanded Image */}
           <div className="aspect-[2/3] relative">
-            {posterUrl && (
+            {posterUrl ? (
               <img
                 src={posterUrl}
-                alt={movie.title}
+                alt={movie.Title}
                 className="w-full h-full object-cover"
               />
+            ) : (
+              <div className="w-full h-full bg-gray-800 flex items-center justify-center">
+                <span className="text-gray-500 text-sm">No Poster</span>
+              </div>
             )}
           </div>
 
@@ -167,21 +176,21 @@ export default function MovieCard({ movie, onShowDetails, size = 'medium' }: Mov
             <div className="space-y-1">
               <div className="flex items-center gap-2 text-xs">
                 <span className="text-green-500 font-medium">
-                  {Math.round(movie.vote_average * 10)}% Match
+                  {movie.imdbRating !== 'N/A' ? `${movie.imdbRating} Rating` : 'N/A'}
                 </span>
                 <span className="border border-gray-600 px-1 text-gray-400">
                   HD
                 </span>
-                {movie.adult && (
+                {movie.Rated === 'R' && (
                   <span className="border border-gray-600 px-1 text-gray-400">
-                    18+
+                    R
                   </span>
                 )}
               </div>
               <div className="flex flex-wrap gap-1">
-                {movie.genre_ids?.slice(0, 3).map((genreId) => (
-                  <span key={genreId} className="text-xs text-gray-400">
-                    • Genre {genreId}
+                {movie.Genre !== 'N/A' && movie.Genre.split(',').slice(0, 3).map((genre) => (
+                  <span key={genre} className="text-xs text-gray-400">
+                    • {genre.trim()}
                   </span>
                 ))}
               </div>

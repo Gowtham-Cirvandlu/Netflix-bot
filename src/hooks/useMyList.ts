@@ -29,10 +29,10 @@ export const useMyList = () => {
   }, [myList]);
 
   const addToMyList = (movie: Movie) => {
-    const exists = myList.some(item => item.id === movie.id);
+    const exists = myList.some(item => item.imdbID === movie.imdbID);
     if (!exists) {
       const newItem: MyListItem = {
-        id: movie.id,
+        imdbID: movie.imdbID,
         movie,
         addedAt: new Date().toISOString(),
       };
@@ -42,12 +42,12 @@ export const useMyList = () => {
     return false;
   };
 
-  const removeFromMyList = (movieId: number) => {
-    setMyList(prev => prev.filter(item => item.id !== movieId));
+  const removeFromMyList = (imdbId: string) => {
+    setMyList(prev => prev.filter(item => item.imdbID !== imdbId));
   };
 
-  const isInMyList = (movieId: number) => {
-    return myList.some(item => item.id === movieId);
+  const isInMyList = (imdbId: string) => {
+    return myList.some(item => item.imdbID === imdbId);
   };
 
   const clearMyList = () => {
