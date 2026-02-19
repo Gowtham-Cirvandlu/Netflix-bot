@@ -6,6 +6,7 @@ import Footer from '@/components/layout/Footer'
 import HeroSection from '@/components/movies/HeroSection'
 import MovieRow from '@/components/movies/MovieRow'
 import MovieDetailModal from '@/components/movies/MovieDetailModal'
+import PremiumGateModal from '@/components/movies/PremiumGateModal'
 import ErrorDisplay from '@/components/ErrorDisplay'
 import { 
   usePopularMovies, 
@@ -14,15 +15,20 @@ import {
   useFeaturedMovie 
 } from '@/hooks/useMovies'
 import { useMyList } from '@/hooks/useMyList'
+import { useAuth } from '@/context/AuthContext'
 import type { Movie } from '@/types/movie'
 
 export default function Browse() {
   const [searchParams] = useSearchParams()
   const listType = searchParams.get('list')
   const queryClient = useQueryClient()
+  const { user, isAuthenticated } = useAuth()
   
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null)
   const [modalOpen, setModalOpen] = useState(false)
+  const [premiumModalOpen, setPremiumModalOpen] = useState(false)
+  const isPremium = isAuthenticated && user?.subscription_status === 'premium'
+  const isGuest = !isAuthenticated
 
   const { data: featuredData, isLoading: featuredLoading, error: featuredError } = useFeaturedMovie()
   const { data: popularData, isLoading: popularLoading, error: popularError } = usePopularMovies()
@@ -32,6 +38,13 @@ export default function Browse() {
   const { myList } = useMyList()
 
   const handleShowDetails = (movie: Movie) => {
+    // Show premium gate for guests or free users trying to access premium content
+    if (isGuest || !isPremium) {
+      setSelectedMovie(movie)
+      setPremiumModalOpen(true)
+      return
+    }
+    
     setSelectedMovie(movie)
     setModalOpen(true)
   }
@@ -134,6 +147,13 @@ export default function Browse() {
         movie={selectedMovie}
         open={modalOpen}
         onOpenChange={setModalOpen}
+      />
+
+      <PremiumGateModal
+        movie={selectedMovie}
+        open={premiumModalOpen}
+        onOpenChange={setPremiumModalOpen}
+        isGuest={isGuest}
       />
     </div>
   )

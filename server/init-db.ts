@@ -11,7 +11,7 @@ const initDatabase = async () => {
     await query(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`);
     console.log('✓ UUID extension enabled');
 
-    // Create users table
+    // Create users table with subscription status
     await query(`
       CREATE TABLE IF NOT EXISTS users (
         id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -20,10 +20,12 @@ const initDatabase = async () => {
         phone VARCHAR(50),
         password_hash VARCHAR(255) NOT NULL,
         gender VARCHAR(50),
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        subscription_status VARCHAR(50) DEFAULT 'free',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
-    console.log('✓ Users table created');
+    console.log('✓ Users table created with subscription support');
 
     // Create index on email
     await query(`

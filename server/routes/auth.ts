@@ -59,12 +59,12 @@ router.post('/register', async (req: Request, res: Response) => {
     const saltRounds = 12;
     const password_hash = await bcrypt.hash(password, saltRounds);
 
-    // Insert user
+    // Insert user with free subscription by default
     const result = await query(
-      `INSERT INTO users (full_name, email, phone, password_hash, gender)
-       VALUES ($1, $2, $3, $4, $5)
-       RETURNING id, full_name, email, phone, gender, created_at`,
-      [full_name, email.toLowerCase(), phone || null, password_hash, mapGender(gender)]
+      `INSERT INTO users (full_name, email, phone, password_hash, gender, subscription_status)
+       VALUES ($1, $2, $3, $4, $5, $6)
+       RETURNING id, full_name, email, phone, gender, subscription_status, created_at`,
+      [full_name, email.toLowerCase(), phone || null, password_hash, mapGender(gender), 'free']
     );
 
     const user: UserResponse = result.rows[0];
@@ -99,7 +99,7 @@ router.post('/login', async (req: Request, res: Response) => {
 
     // Find user
     const result = await query(
-      'SELECT id, full_name, email, phone, gender, password_hash, created_at FROM users WHERE email = $1',
+      'SELECT id, full_name, email, phone, gender, subscription_status, password_hash, created_at FROM users WHERE email = $1',
       [email.toLowerCase()]
     );
 
@@ -126,6 +126,7 @@ router.post('/login', async (req: Request, res: Response) => {
       email: user.email,
       phone: user.phone,
       gender: user.gender,
+      subscription_status: user.subscription_status,
       created_at: user.created_at,
     };
 
@@ -150,7 +151,7 @@ router.get('/me', authenticateToken, async (req: AuthRequest, res: Response) => 
     }
 
     const result = await query(
-      'SELECT id, full_name, email, phone, gender, created_at FROM users WHERE id = $1',
+      'SELECT id, full_name, email, phone, gender, subscription_status, created_at FROM users WHERE id = $1',
       [userId]
     );
 

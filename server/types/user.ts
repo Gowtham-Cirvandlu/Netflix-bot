@@ -5,6 +5,7 @@ export interface User {
   phone: string | null;
   gender: string | null;
   password_hash: string;
+  subscription_status: string;
   created_at: string;
 }
 
@@ -14,6 +15,7 @@ export interface UserResponse {
   email: string;
   phone: string | null;
   gender: string | null;
+  subscription_status: string;
   created_at: string;
 }
 

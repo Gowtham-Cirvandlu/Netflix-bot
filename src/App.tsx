@@ -3,6 +3,7 @@ import { TooltipProvider } from '@/components/ui/tooltip'
 import { AuthProvider } from '@/context/AuthContext'
 import NetflixNavbar from '@/components/layout/NetflixNavbar'
 import ProtectedRoute from '@/components/layout/ProtectedRoute'
+import PublicRoute from '@/components/layout/PublicRoute'
 import Browse from '@/pages/Browse'
 import Search from '@/pages/Search'
 import NotFound from '@/pages/NotFound'
@@ -22,9 +23,9 @@ function App() {
             <Route 
               path="/browse" 
               element={
-                <ProtectedRoute>
+                <PublicRoute>
                   <Browse />
-                </ProtectedRoute>
+                </PublicRoute>
               } 
             />
             <Route 
