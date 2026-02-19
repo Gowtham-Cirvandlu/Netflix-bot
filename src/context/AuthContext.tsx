@@ -9,6 +9,7 @@ interface AuthContextType {
   register: (data: RegisterData) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
   isAuthenticated: boolean;
+  checkHealth: () => Promise<{ success: boolean; error?: string }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -89,14 +90,17 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
       setUser(data.user);
       setToken(data.token);
-      
+
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
 
       return { success: true };
     } catch (error) {
       console.error('Login error:', error);
-      return { success: false, error: 'Network error. Please try again.' };
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        return { success: false, error: 'Unable to connect to server. Please make sure the backend server is running on port 5000.' };
+      }
+      return { success: false, error: 'Network error. Please check your connection and try again.' };
     }
   };
 
@@ -118,14 +122,17 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
       setUser(result.user);
       setToken(result.token);
-      
+
       localStorage.setItem('token', result.token);
       localStorage.setItem('user', JSON.stringify(result.user));
 
       return { success: true };
     } catch (error) {
       console.error('Registration error:', error);
-      return { success: false, error: 'Network error. Please try again.' };
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        return { success: false, error: 'Unable to connect to server. Please make sure the backend server is running on port 5000.' };
+      }
+      return { success: false, error: 'Network error. Please check your connection and try again.' };
     }
   };
 
@@ -136,6 +143,29 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     localStorage.removeItem('user');
   };
 
+  const checkHealth = async (): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const response = await fetch(`${API_URL}/health`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        return { success: true };
+      } else {
+        return { success: false, error: 'Server is not responding correctly' };
+      }
+    } catch (error) {
+      console.error('Health check error:', error);
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        return { success: false, error: 'Unable to connect to server. Please make sure the backend server is running on port 5000.' };
+      }
+      return { success: false, error: 'Network error. Please check your connection and try again.' };
+    }
+  };
+
   const value: AuthContextType = {
     user,
     token,
@@ -143,7 +173,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     login,
     register,
     logout,
-    isAuthenticated: !!user && !!token
+    isAuthenticated: !!user && !!token,
+    checkHealth
   };
 
   return (
