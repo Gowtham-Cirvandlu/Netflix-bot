@@ -1,17 +1,25 @@
 import { Pool } from 'pg';
-import fs from 'fs';
-import path from 'path';
+import dotenv from 'dotenv';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// Load env vars from root directory
+dotenv.config({ path: join(__dirname, '..', '.env') });
+
+console.log('Connecting to database:', process.env.DB_HOST);
 
 const pool = new Pool({
   host: process.env.DB_HOST,
-  port: parseInt(process.env.DB_PORT || '5432'),
+  port: parseInt(process.env.DB_PORT || '11473'),
   database: process.env.DB_NAME,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
-  ssl: process.env.DB_HOST?.includes('aivencloud.com') ? {
-    ca: fs.readFileSync(path.join(__dirname, 'ca.pem')).toString(),
-    rejectUnauthorized: true
-  } : undefined,
+  ssl: {
+    rejectUnauthorized: false  // Required for Aiven without CA cert
+  },
   max: 20,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 10000,

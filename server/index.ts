@@ -2,13 +2,19 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import authRoutes from './routes/auth';
-import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 
-dotenv.config();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+dotenv.config({ path: join(__dirname, '..', '.env') });
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:5173';
+
+console.log('Connecting to database:', process.env.DB_HOST);
 
 // Middleware
 app.use(cors({
@@ -20,12 +26,13 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve static files
-app.use('/cert', express.static(path.join(__dirname)));
-
 // Routes
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+  res.json({ 
+    status: 'ok', 
+    timestamp: new Date().toISOString(),
+    database: process.env.DB_HOST ? 'configured' : 'not configured'
+  });
 });
 
 app.use('/api/auth', authRoutes);
@@ -46,5 +53,5 @@ app.use((err: Error, req: express.Request, res: express.Response, next: express.
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`🌐 Client URL: ${CLIENT_URL}`);
-  console.log(`📝 API Docs: http://localhost:${PORT}/api/health`);
+  console.log(`📝 Health Check: http://localhost:${PORT}/api/health`);
 });
